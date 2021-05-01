@@ -1,0 +1,307 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Solid introduction",
+    "description": "Challenge 01 - Solid introduction",
+    "contact": {
+      "name": "Lucas",
+      "email": "lucas_mello6@hotmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3333/",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Create a user",
+        "description": "Create a new user",
+        "requestBody" : {
+          "description": "Mandatory fields for creating a user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User",
+                "required": ["email", "name"],
+                "example": {
+                  "email": "example@email.com",
+                  "name": "example name"
+                }
+              }
+            }
+          },
+          "required": true  
+        },
+        "responses": {
+          "201": {
+            "description": "New user has been created",
+            "content": {
+              "application/json":{
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedUSer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {
+              "application/json": {
+                "schema":{
+                  "$ref": "#/components/schemas/errorEmail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["users"],
+        "summary": "Get all users",
+        "description": "Get list of all users",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "header",
+            "description": "user_id",
+            "required": true,
+            "schema":{
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users returned with success",
+            "content": {
+              "application/json":{
+                "schema":{
+                  "type": "array",
+                  "items":{
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/CreatedUSer"   
+                      },
+                      {
+                        "$ref": "#/components/schemas/CreatedUSer"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404":{
+            "description": "This user is not admin",
+            "content": {
+              "application/json":{
+                "schema": {
+                  "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "This user does not hace permissiob to get List"
+                       }
+                    }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}":{
+      "get":{
+        "tags": ["users"],
+        "summary": "Get user",
+        "description": "Get a user from id",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "Id from user",
+            "required": true,
+            "schema":{}
+          }
+        ],
+        "responses": {
+          "200":{
+            "description": "Get user success",
+            "content": {
+              "application/json":{
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedUSer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application:json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}/admin": {
+      "patch": {
+        "tags": ["users"],
+        "summary": "Turn admin",
+        "description": "Turn user to admin",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User id",
+            "required": true,
+            "schema":{}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User turn to admin with success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id":{
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "admin":{
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "name":{
+                      "$ref": "#/components/schemas/name"
+                    },
+                    "email": {
+                      "$ref": "#/components/schemas/email"
+                    },
+                    "created_at": {
+                      "$ref": "#/components/schemas/created_at"
+                    },
+                    "updated_at": {
+                      "$ref": "#/components/schemas/updated_at"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application:json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "name": {
+        "type": "string",
+        "example": "Lucas de mello"
+      },
+      "email":{
+        "type": "string",
+        "example": "lucas_mello6@hotmail.com"
+      },
+      "id":{
+        "type": "string",
+        "format": "uuid",
+        "example": "32437d00-a43d-4193-ae35-e73739fc6328"
+      },
+      "admin":{
+        "type": "boolean",
+        "example": false
+      },
+      "created_at":{
+        "type": "string",
+        "example": "2021-05-01T14:21:56.854Z"
+      },
+      "updated_at":{
+        "type": "string",
+        "example": "2021-05-01T14:21:56.854Z"
+      },
+      "errorEmail":{
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "This email is already in use"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "email": {
+            "$ref": "#/components/schemas/email"
+          }
+        }
+      },
+      "CreatedUSer":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "$ref": "#/components/schemas/id"
+          },
+          "admin":{
+            "$ref": "#/components/schemas/admin"
+          },
+          "name":{
+            "$ref": "#/components/schemas/name"
+          },
+          "email": {
+            "$ref": "#/components/schemas/email"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/created_at"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/updated_at"
+          }
+        }
+      },
+      "ListUsers":{
+        "type": "array",
+        "items":{
+          "type": "object"
+        }
+      }
+    }
+  }
+}
